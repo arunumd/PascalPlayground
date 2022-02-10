@@ -2,13 +2,16 @@ unit Sorting;
 
 interface
 
-type
+  type
     Vector = array of Integer;
 
-  procedure merge(var arr: Vector; l: Integer; m: Integer;
-    r: Integer);
+  procedure merge(var arr: Vector; l: Integer; m: Integer; r: Integer);
 
   procedure mergesort(var arr: Vector; l: Integer; r: Integer);
+
+  function partition(var arr: Vector; l: Integer; r: Integer): Integer;
+
+  procedure quicksort(var arr: Vector; l: Integer; r: Integer);
 
   procedure spawn(var arr: Vector);
 
@@ -74,27 +77,80 @@ implementation
     end;
 
   procedure spawn(var arr: Vector);
-  var
-  i : Integer;
-  begin
-    for i := Low(arr) to High(arr) do
-    if (i <> High(arr)) then write(arr[i], ' ')
-    else writeln(arr[i]);
-  end;
+    var
+      i: Integer;
+    begin
+      for i := Low(arr) to High(arr) do
+        begin
+          if (i <> High(arr)) then
+            write(arr[i], ' ')
+          else
+            writeln(arr[i]);
+        end;
+    end;
+
+  procedure swap(a: PInteger; b: PInteger);
+    var
+      temp: Integer;
+    begin
+      temp := a^;
+      a^ := b^;
+      b^ := temp;
+    end;
+
+  function partition(var arr: Vector; l: Integer; r: Integer): Integer;
+    var
+      pivot, i, j: Integer;
+    begin
+      pivot := arr[r];
+      i := (l - 1);
+      for j := l to r - 1 do
+        begin
+          if (arr[j] <= pivot) then
+            begin
+              Inc(i);
+              swap(@arr[i], @arr[j]);
+            end;
+        end;
+      swap(@arr[i + 1], @arr[r]);
+      Result := i + 1;
+
+    end;
+
+  procedure quicksort(var arr: Vector; l: Integer; r: Integer);
+    var
+      pi: Integer;
+    begin
+      if (l < r) then
+        begin
+          pi := Trunc(partition(arr, l, r));
+          quicksort(arr, l, pi - 1);
+          quicksort(arr, pi + 1, r);
+        end;
+    end;
 
   procedure main();
-  var
-  arr : Vector;
-  begin
-     SetLength(arr, 8);
-     arr := [99, 56, 21, 88, 56, 3, 11, 16];
-     writeln('Array before sorting was :');
-     spawn(arr);
-     mergesort(arr, 0, 7);
-     writeln('');
-     writeln('Array after sorting is :');
-     spawn(arr);
-     readln;
-  end;
+    var
+      arr: Vector;
+    begin
+      Setlength(arr, 8);
+      arr := [99, 56, 21, 88, 56, 3, 11, 16];
+      writeln('Array before sorting was :');
+      spawn(arr);
+      mergesort(arr, 0, 7);
+      writeln('');
+      writeln('Array after merge sorting is :');
+      spawn(arr);
+
+      arr := [99, 56, 21, 88, 56, 3, 11, 16];
+      writeln('');
+      writeln('Array before sorting was :');
+      spawn(arr);
+      quicksort(arr, 0, 7);
+      writeln('');
+      writeln('Array after quick sorting is :');
+      spawn(arr);
+      readln;
+    end;
 
 end.
